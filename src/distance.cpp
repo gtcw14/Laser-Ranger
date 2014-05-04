@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
   ros::Publisher distance_pub = n.advertise<std_msgs::Float64>("distance", 1000);
   
-  CvCapture* capture = cvCreateCameraCapture(0); //Capture from the webcams
+  CvCapture* capture = cvCreateCameraCapture(0); //Capture from the webcam
   assert(capture != NULL); //Make sure that webcam is connected
 
   ros::Rate loop_rate(10);
@@ -63,21 +63,16 @@ double getDistance(CvCapture* capture){
     IplImage* hsvframe = cvCreateImage(cvSize(frame->width,frame->height),frame->depth,3); //HSV
     IplImage* h = cvCreateImage(cvSize(frame->width,frame->height),frame->depth,1); //Hue
     IplImage* v = cvCreateImage(cvSize(frame->width,frame->height),frame->depth,1); //Value
-    //IplImage* v2 = cvCreateImage(cvSize(frame->width,frame->height),frame->depth,1);
     IplImage* laser = cvCreateImage(cvSize(frame->width,frame->height),frame->depth,1); //Laser dot
 
     cvSplit(frame, NULL, NULL, r, NULL); //Split the frame into b, g, and r
     cvCvtColor(frame, hsvframe, CV_RGB2HSV); //Convert the color from bgr to hsv
     cvSplit(hsvframe, h, NULL, v, NULL); //Split the HSV image
     
-    //v2 = v;
-    
-    //cvThreshold(v2,v2,0,15,CV_THRESH_BINARY); //Value between 250 and 255
     cvThreshold(v,v,250,255,CV_THRESH_BINARY); //Value between 250 and 255
     cvThreshold(r,r,250,255,CV_THRESH_BINARY); //Red between 250 and 255
     cvThreshold(h,h,0,6,CV_THRESH_BINARY); //Hue between 0 and 6
     
-    //cvOr(v,v2,v);
     cvAnd(r,v,laser); //All three of the above conditions have to be met
     cvAnd(h,laser,laser);
 
